@@ -27,15 +27,14 @@ all_t = [i * t_step for i in range(1, 101)]
 for t in all_t:
     vx = 10 if t < 4 else 0
     vy = 5 if t < 7 and t > 2 else 0
-    botkf._predict(t, vx, vy)
-    botkf._skip_measure()
-    omega_x, omega_y = botkf._peek_omega()
-    pos_x, pos_y = botkf._peek_pos()
+    botkf.simulate_system(t, vx, vy)
+    omega_x, omega_y = botkf.peek_omega()
+    pos_x, pos_y = botkf.peek_pos()
     all_omega_x.append(omega_x)
     all_omega_y.append(omega_y)
     all_pos_x.append(pos_x)
     all_pos_y.append(pos_y)
-    i_x, _ = botkf._peek_current()
+    i_x, _ = botkf.peek_current()
 plt.subplot(221)
 plt.plot(all_t, all_omega_x)
 plt.grid()

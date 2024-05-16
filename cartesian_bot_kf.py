@@ -74,15 +74,15 @@ class CartesianBotKF:
 
     def _skip_measure(self):
         self.state = self.predicted_state
-        self.state_cov = self.predicted_state_cov
+        self.state_cov = numpy.identity(6) * default_var
 
-    def _peek_pos(self):
+    def peek_pos(self):
         return self.state[0, 0], self.state[3, 0]
 
-    def _peek_omega(self):
+    def peek_omega(self):
         return self.state[1, 0], self.state[4, 0]
 
-    def _peek_current(self):
+    def peek_current(self):
         return self.state[2, 0], self.state[5, 0]
 
     def _measure(self, z_x, z_y,
@@ -107,6 +107,10 @@ class CartesianBotKF:
                        rho_zxy = 0):
         self._predict(timestamp, v_x, v_y, var_vx, var_vy)
         self._measure(z_x, z_y, var_zx, var_zy, rho_zxy)
+
+    def simulate_system(self, timestamp, v_x, v_y):
+        self._predict(timestamp, v_x, v_y)
+        self._skip_measure()
 
     def get_estimate(self):
         z = self.C_matrix() @ self.state

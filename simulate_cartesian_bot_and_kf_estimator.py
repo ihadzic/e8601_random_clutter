@@ -60,9 +60,8 @@ def generate_measurement(xm, ym):
 
 for i in range(len(all_t)):
     # move the system under simulation using noisy input
-    bot_model._predict(all_t[i], vx[i], vy[i])
-    bot_model._skip_measure()
-    xgt, ygt = bot_model._peek_pos()
+    bot_model.simulate_system(all_t[i], vx[i], vy[i])
+    xgt, ygt = bot_model.peek_pos()
     x_ground_truth.append(xgt)
     y_ground_truth.append(ygt)
     zx, zy, var_zx, var_zy, rho_zxy = generate_measurement(xgt, ygt)
