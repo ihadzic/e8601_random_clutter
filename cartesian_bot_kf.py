@@ -42,7 +42,7 @@ class CartesianBotKF:
         A[2, 1] = A[5, 4] = -delta_t * self.K / self.L
         A[2, 2] = A[5, 5] = 1 - delta_t * self.R / self.L
         return A
-        
+
     def B_matrix(self, delta_t = default_time_step):
         B = numpy.zeros((6, 2))
         B[2, 0] = B[5, 1] = delta_t / self.L
@@ -93,16 +93,14 @@ class CartesianBotKF:
             [rho_zxy * math.sqrt(var_zx) * math.sqrt(var_zy), var_zy]])
         z = numpy.array([[z_x],
                          [z_y]])
-        CSigmaXCT = self.C_matrix() @ \
-            self.predicted_state * self.C_matrix.transpose()
-        C_inv = numpy.linalg.inv(self.C_matrix())
-        K = CSigmaXCT @ numpy.linalg.inv(CSigmaXCT + sigma_z)
-        self.state = self.predicted_state + C_inv @ K @ \
+        SigmaXCT =  self.predicted_state_cov @ self.C_matrix().transpose()
+        CSigmaXCT = self.C_matrix() @ SigmaXCT
+        K = SigmaXCT @ numpy.linalg.inv(CSigmaXCT + sigma_z)
+        self.state = self.predicted_state + K @ \
             (z - self.C_matrix() @ self.predicted_state)
-        self.state_cov = (numpy.identity(2) - \
-                          C_inv @ K @ self.C_matrix()) @ \
-                          self.predicted_state_cov
-        
+        self.state_cov = (numpy.identity(6) - K @ self.C_matrix()) @ \
+            self.predicted_state_cov
+
     def advance_filter(self, timestamp, v_x, v_y, z_x, z_y,
                        var_vx = default_var, var_vy = default_var,
                        var_zx = default_var, var_zy = default_var,
