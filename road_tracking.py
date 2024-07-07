@@ -6,13 +6,16 @@ import numpy as np
 
 class RoadTrackSim:
     def __init__(self, x_vert, y_horiz, road_width,
-                 velocity, velocity_variance, num_particles):
+                 velocity, velocity_variance, measurement_variance,
+                 num_particles):
         self.fig, self.ax = plt.subplots()
         self.num_particles = num_particles
         self.particle_plot, = self.ax.plot([], [], 'g.')
         self.gt_plot, = self.ax.plot([], [], 'bx')
+        self.measurement_plot, = self.ax.plot([], [], 'ro')
         self.velocity = velocity
         self.velocity_variance = velocity_variance
+        self.measurement_variance = measurement_variance
         self.x_vert = x_vert
         self.y_horiz = y_horiz
         self.road_width = road_width
@@ -25,6 +28,8 @@ class RoadTrackSim:
         self.time = 0
         self.gt_x = x_vert
         self.gt_y = 0
+        self.measurement_x = None
+        self.measurement_y = None
         self.init_particles(var = 1)
 
     def is_on_road(self, x, y):
@@ -122,6 +127,13 @@ class RoadTrackSim:
             self.apply_motion_model(*p, delta_t) for p in self.particles
         ]
 
+    def generate_measurement(self):
+        self.measurement_x, self.measurement_y = \
+            np.random.multivariate_normal(
+                mean = [ self.gt_x, self.gt_y ],
+                cov = [[ self.measurement_variance, 0 ],
+                       [ 0, self.measurement_variance ]])
+
     def resample(self):
         # placeholder for now, just copy predicted particles
         self.particles = self.predicted_particles
@@ -134,6 +146,7 @@ class RoadTrackSim:
 
     def redraw(self):
         self.gt_plot.set_data(self.gt_x, self.gt_y)
+        self.measurement_plot.set_data(self.measurement_x, self.measurement_y)
         self.particle_plot.set_data(
             [ x[0] for x in self.particles ],
             [ x[1] for x in self.particles ])
@@ -152,6 +165,7 @@ road_track = RoadTrackSim(
     road_width = 1,
     velocity = 1,
     velocity_variance = 0.1,
+    measurement_variance = 0.25,
     num_particles = 500)
 # set aspect ratio to equal for correct representation
 plt.ion()
@@ -168,6 +182,7 @@ for i in range(max_iter):
 
     # filter simulation
     road_track.move_particles(t)
+    road_track.generate_measurement()
     road_track.resample()
 
     # common (progress time)
