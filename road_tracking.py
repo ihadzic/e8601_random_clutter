@@ -151,7 +151,7 @@ road_track = RoadTrackSim(
     y_horiz = 10,
     road_width = 1,
     velocity = 1,
-    velocity_variance = 0.025,
+    velocity_variance = 0.1,
     num_particles = 500)
 # set aspect ratio to equal for correct representation
 plt.ion()
