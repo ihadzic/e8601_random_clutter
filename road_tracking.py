@@ -9,7 +9,7 @@ import argparse
 class RoadTrackSim:
     def __init__(self, x_vert, y_horiz, road_width,
                  velocity, velocity_variance, measurement_variance,
-                 num_particles):
+                 num_particles, randomize_velocity):
         self.fig, self.ax = plt.subplots()
         self.num_particles = num_particles
         self.particle_plot, = self.ax.plot([], [], 'g.')
@@ -17,6 +17,7 @@ class RoadTrackSim:
         self.measurement_plot, = self.ax.plot([], [], 'ro')
         self.velocity = velocity
         self.velocity_variance = velocity_variance
+        self.randomize_velocity = randomize_velocity
         self.measurement_variance = measurement_variance
         self.x_vert = x_vert
         self.y_horiz = y_horiz
@@ -75,15 +76,20 @@ class RoadTrackSim:
         self.ax.grid()
 
     def move_vehicle(self, time):
+        if self.randomize_velocity:
+            velocity = np.random.normal(loc = self.velocity,
+                                        scale = np.sqrt(self.velocity_variance))
+        else:
+            velocity = self.velocity
         delta_t = time - self.time
         if self.gt_y < self.y_horiz:
-            self.gt_y += self.velocity * delta_t
+            self.gt_y += velocity * delta_t
             delta_x = self.gt_y - self.y_horiz
             if delta_x > 0:
                 self.gt_y = self.y_horiz
                 self.gt_x -= delta_x
         elif self.gt_x > 0:
-            self.gt_x -= self.velocity * delta_t
+            self.gt_x -= velocity * delta_t
 
     def apply_motion_model(self, x, y, delta_t):
         def move_up(x, y, delta_t):
@@ -192,6 +198,8 @@ parser.add_argument('--mvar', type=float, default=1,
                   help='measurement variance')
 parser.add_argument('--npart', type=int, default=500,
                   help='number of particles to use')
+parser.add_argument('--randvel', action='store_true',
+                    help='randomize vehicle true velocity')
 args = parser.parse_args()
 
 road_track = RoadTrackSim(
@@ -201,8 +209,10 @@ road_track = RoadTrackSim(
     velocity = args.vvel,
     velocity_variance = args.vvar,
     measurement_variance = args.mvar,
-    num_particles = args.npart)
-# set aspect ratio to equal for correct representation
+    num_particles = args.npart,
+    randomize_velocity = args.randvel)
+
+# enter interactive mode and show the plot
 plt.ion()
 plt.show()
 
