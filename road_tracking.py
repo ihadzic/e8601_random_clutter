@@ -9,12 +9,13 @@ import argparse
 class RoadTrackSim:
     def __init__(self, x_vert, y_horiz, road_width,
                  velocity, velocity_variance, measurement_variance,
-                 num_particles, randomize_velocity):
+                 num_particles, randomize_velocity, display_measurement):
         self.fig, self.ax = plt.subplots()
         self.num_particles = num_particles
         self.particle_plot, = self.ax.plot([], [], 'g.')
         self.gt_plot, = self.ax.plot([], [], 'bx')
         self.measurement_plot, = self.ax.plot([], [], 'ro')
+        self.display_measurement = display_measurement
         self.velocity = velocity
         self.velocity_variance = velocity_variance
         self.randomize_velocity = randomize_velocity
@@ -158,6 +159,9 @@ class RoadTrackSim:
             self.predicted_particles[i] for i in sample_indices
         ]
 
+    def fake_resample(self):
+        self.particles = self.predicted_particles
+
     def advance_time(self, time):
         self.time = time
 
@@ -166,7 +170,9 @@ class RoadTrackSim:
 
     def redraw(self):
         self.gt_plot.set_data(self.gt_x, self.gt_y)
-        self.measurement_plot.set_data(self.measurement_x, self.measurement_y)
+        if self.display_measurement:
+            self.measurement_plot.set_data(
+                self.measurement_x, self.measurement_y)
         self.particle_plot.set_data(
             [ x[0] for x in self.particles ],
             [ x[1] for x in self.particles ])
@@ -201,6 +207,8 @@ parser.add_argument('--npart', type=int, default=500,
                   help='number of particles to use')
 parser.add_argument('--randvel', action='store_true',
                     help='randomize vehicle true velocity')
+parser.add_argument('--noresample', action='store_true',
+                    help='turn off resampling, reducing the filter to just prediction')
 args = parser.parse_args()
 
 road_track = RoadTrackSim(
@@ -211,7 +219,8 @@ road_track = RoadTrackSim(
     velocity_variance = args.vvar,
     measurement_variance = args.mvar,
     num_particles = args.npart,
-    randomize_velocity = args.randvel)
+    randomize_velocity = args.randvel,
+    display_measurement = not args.noresample)
 
 # enter interactive mode and show the plot
 plt.ion()
@@ -229,8 +238,11 @@ while True:
         # filter simulation
         road_track.move_particles(t)
         road_track.generate_measurement()
-        road_track.score_particles()
-        road_track.resample()
+        if args.noresample:
+            road_track.fake_resample()
+        else:
+            road_track.score_particles()
+            road_track.resample()
 
         # common (progress time)
         road_track.advance_time(delta_t)
