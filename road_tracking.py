@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import random
 import time
+from scipy.stats import norm
 import numpy as np
 
 class RoadTrackSim:
@@ -120,9 +121,6 @@ class RoadTrackSim:
 
     def move_particles(self, time):
         delta_t = time - self.time
-        self.particle_importance = [
-            # TODO
-        ]
         self.predicted_particles = [
             self.apply_motion_model(*p, delta_t) for p in self.particles
         ]
@@ -134,9 +132,23 @@ class RoadTrackSim:
                 cov = [[ self.measurement_variance, 0 ],
                        [ 0, self.measurement_variance ]])
 
+    def score_particles(self):
+        particle_importance = [
+            norm.pdf(np.linalg.norm([x - self.measurement_x,
+                                     y - self.measurement_y]),
+                     scale = self.measurement_variance) \
+            for x, y in self.predicted_particles
+        ]
+        self.particle_importance = [
+            x / sum(particle_importance) for x in particle_importance ]
+
     def resample(self):
-        # placeholder for now, just copy predicted particles
-        self.particles = self.predicted_particles
+        sample_indices = np.random.choice(
+            np.arange(0, self.num_particles), size = self.num_particles,
+            p = self.particle_importance)
+        self.particles = [
+            self.predicted_particles[i] for i in sample_indices
+        ]
 
     def advance_time(self, time):
         self.time = time
