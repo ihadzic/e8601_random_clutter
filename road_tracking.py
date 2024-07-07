@@ -71,8 +71,9 @@ class RoadTrackSim:
         self.ax.fill(*zip(*road_vertices), color='gray', alpha=0.5)
 
         # set the plot limits
-        self.ax.set_xlim(-self.road_width, self.x_vert + self.road_width)
-        self.ax.set_ylim(0, self.y_horiz + self.road_width)
+        padding = self.road_width + np.sqrt(self.measurement_variance)
+        self.ax.set_xlim(-padding, self.x_vert + padding)
+        self.ax.set_ylim(-padding / 2, self.y_horiz + padding)
         self.ax.grid()
 
     def move_vehicle(self, time):
