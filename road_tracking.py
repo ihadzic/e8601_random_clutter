@@ -184,21 +184,22 @@ plt.ion()
 plt.show()
 
 delta_t = 0.1
-max_iter = 500
-for i in range(max_iter):
-    now = time.time()
-    t = road_track.get_time() + delta_t
+while True:
+    if road_track.gt_x > 0:
+        now = time.time()
+        t = road_track.get_time() + delta_t
 
-    # ground truth simulation
-    road_track.move_vehicle(t)
+        # ground truth simulation
+        road_track.move_vehicle(t)
 
-    # filter simulation
-    road_track.move_particles(t)
-    road_track.generate_measurement()
-    road_track.resample()
+        # filter simulation
+        road_track.move_particles(t)
+        road_track.generate_measurement()
+        road_track.score_particles()
+        road_track.resample()
 
-    # common (progress time)
-    road_track.advance_time(delta_t)
+        # common (progress time)
+        road_track.advance_time(delta_t)
 
     # treat the eyeballs
     road_track.redraw()
