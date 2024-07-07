@@ -8,6 +8,7 @@ class RoadTrackSim:
     def __init__(self, x_vert, y_horiz, road_width, velocity, num_particles):
         self.fig, self.ax = plt.subplots()
         self.num_particles = num_particles
+        self.particle_plot, = self.ax.plot([], [], 'g.')
         self.gt_plot, = self.ax.plot([], [], 'bx')
         self.velocity = velocity
         self.x_vert = x_vert
@@ -83,6 +84,9 @@ class RoadTrackSim:
 
     def redraw(self):
         self.gt_plot.set_data(self.gt_x, self.gt_y)
+        self.particle_plot.set_data(
+            [ x[0] for x in self.particles ],
+            [ x[1] for x in self.particles ])
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
