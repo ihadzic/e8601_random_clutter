@@ -5,12 +5,14 @@ import time
 import numpy as np
 
 class RoadTrackSim:
-    def __init__(self, x_vert, y_horiz, road_width, velocity, num_particles):
+    def __init__(self, x_vert, y_horiz, road_width,
+                 velocity, velocity_variance, num_particles):
         self.fig, self.ax = plt.subplots()
         self.num_particles = num_particles
         self.particle_plot, = self.ax.plot([], [], 'g.')
         self.gt_plot, = self.ax.plot([], [], 'bx')
         self.velocity = velocity
+        self.velocity_variance = velocity_variance
         self.x_vert = x_vert
         self.y_horiz = y_horiz
         self.road_width = road_width
@@ -76,6 +78,54 @@ class RoadTrackSim:
         elif self.gt_x > 0:
             self.gt_x -= self.velocity * delta_t
 
+    def apply_motion_model(self, x, y, delta_t):
+        def move_up(x, y, delta_t):
+            return np.random.multivariate_normal(
+                    mean = [ x, y + self.velocity * delta_t],
+                    cov = [
+                        [ self.velocity_variance * delta_t * delta_t, 0 ],
+                        [ 0, self.velocity_variance * delta_t * delta_t ]
+                    ]
+                )
+        def move_left(x, y, delta_t):
+            return np.random.multivariate_normal(
+                mean = [ x - self.velocity * delta_t, y],
+                cov = [
+                    [ self.velocity_variance * delta_t * delta_t, 0 ],
+                    [ 0, self.velocity_variance * delta_t * delta_t ]
+                ]
+            )
+
+        while True:
+            if x > self.x1 and y > self.y1:
+                # intersection, moving in either direction
+                if random.choice([True, False]):
+                    x_new, y_new = move_up(x, y, delta_t)
+                else:
+                    x_new, y_new = move_left(x, y, delta_t)
+            elif x > self.x1:
+                # vertical road segment, moving up
+                x_new, y_new = move_up(x, y, delta_t)
+            else:
+                # horizontal road segment, moving left
+                x_new, y_new = move_left(x, y, delta_t)
+            if self.is_on_road(x_new, y_new):
+                break
+        return x_new, y_new
+
+    def move_particles(self, time):
+        delta_t = time - self.time
+        self.particle_importance = [
+            # TODO
+        ]
+        self.predicted_particles = [
+            self.apply_motion_model(*p, delta_t) for p in self.particles
+        ]
+
+    def resample(self):
+        # placeholder for now, just copy predicted particles
+        self.particles = self.predicted_particles
+
     def advance_time(self, time):
         self.time = time
 
@@ -101,6 +151,7 @@ road_track = RoadTrackSim(
     y_horiz = 10,
     road_width = 1,
     velocity = 1,
+    velocity_variance = 0.025,
     num_particles = 500)
 # set aspect ratio to equal for correct representation
 plt.ion()
@@ -111,7 +162,17 @@ max_iter = 500
 for i in range(max_iter):
     now = time.time()
     t = road_track.get_time() + delta_t
+
+    # ground truth simulation
     road_track.move_vehicle(t)
+
+    # filter simulation
+    road_track.move_particles(t)
+    road_track.resample()
+
+    # common (progress time)
     road_track.advance_time(delta_t)
+
+    # treat the eyeballs
     road_track.redraw()
     display_sleep(now)
