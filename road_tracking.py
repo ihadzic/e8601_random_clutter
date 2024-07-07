@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import random
+import time
 
 def plot_road(ax, x_vert = 10, y_horiz = 10, road_width = 1):
     x1, x2 = x_vert - road_width / 2, x_vert + road_width / 2
@@ -24,10 +25,21 @@ def plot_road(ax, x_vert = 10, y_horiz = 10, road_width = 1):
     ax.set_ylim(0, y_horiz + road_width)
     ax.grid()
 
+def redraw(fig, gt_plot):
+    gt_plot.set_data(random.uniform(0, 4), random.uniform(0, 4))
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+
 fig, ax = plt.subplots()
 plot_road(ax, x_vert=5, y_horiz=10, road_width=2)
+gt_plot, = ax.plot([], [], 'bx')
 
 # set aspect ratio to equal for correct representation
 fig.gca().set_aspect('equal', adjustable='box')
+plt.ion()
 plt.show()
+
+for i in range(50):
+    redraw(fig, gt_plot)
+    time.sleep(0.5)
 
