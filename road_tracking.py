@@ -16,13 +16,13 @@ class RoadTrackSim:
         self.x2 = self.x_vert + self.road_width / 2
         self.y1 = self.y_horiz - self.road_width / 2
         self.y2 = self.y_horiz + self.road_width / 2
-        self._plot_road()
+        self.plot_road()
         self.fig.gca().set_aspect('equal', adjustable='box')
         self.time = 0
         self.gt_x = x_vert
         self.gt_y = 0
 
-    def _plot_road(self):
+    def plot_road(self):
         # road edges
         self.ax.plot([self.x1, self.x1], [0, self.y1], color='black')
         self.ax.plot([self.x2, self.x2], [0, self.y2], color='black')
