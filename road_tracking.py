@@ -4,6 +4,7 @@ import random
 import time
 from scipy.stats import norm
 import numpy as np
+import argparse
 
 class RoadTrackSim:
     def __init__(self, x_vert, y_horiz, road_width,
@@ -171,14 +172,36 @@ def display_sleep(now):
     if sleep_time > 0:
         time.sleep(sleep_time)
 
+parser = argparse.ArgumentParser(
+    description = 'Simulates the fusion between the map information and GPS.'
+    'The vehicle is assumed to be moving at velocity v following the road.'
+    'It is assumed that the velocity is known with specified variance'
+    'GPS error is modeled as zero-mean Gaussian process with specified variance'
+)
+parser.add_argument('--xvert', type=float, default=5,
+                  help='x coordinate of the vertical road segment')
+parser.add_argument('--yhoriz', type=float, default=10,
+                  help='y coordinate of the horizontal road segment')
+parser.add_argument('--rwidth', type=float, default=1,
+                  help='road width')
+parser.add_argument('--vvel', type=float, default=1,
+                  help='nominal vehicle velocity')
+parser.add_argument('--vvar', type=float, default=0.2,
+                  help='vehicle velocioty variance')
+parser.add_argument('--mvar', type=float, default=1,
+                  help='measurement variance')
+parser.add_argument('--npart', type=int, default=500,
+                  help='number of particles to use')
+args = parser.parse_args()
+
 road_track = RoadTrackSim(
-    x_vert = 5,
-    y_horiz = 10,
-    road_width = 1,
-    velocity = 1,
-    velocity_variance = 0.2,
-    measurement_variance = 1,
-    num_particles = 500)
+    x_vert = args.xvert,
+    y_horiz = args.yhoriz,
+    road_width = args.rwidth,
+    velocity = args.vvel,
+    velocity_variance = args.vvar,
+    measurement_variance = args.mvar,
+    num_particles = args.npart)
 # set aspect ratio to equal for correct representation
 plt.ion()
 plt.show()
