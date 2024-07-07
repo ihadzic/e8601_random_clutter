@@ -2,11 +2,12 @@
 import matplotlib.pyplot as plt
 import random
 import time
-
+import numpy as np
 
 class RoadTrackSim:
-    def __init__(self, x_vert, y_horiz, road_width, velocity):
+    def __init__(self, x_vert, y_horiz, road_width, velocity, num_particles):
         self.fig, self.ax = plt.subplots()
+        self.num_particles = num_particles
         self.gt_plot, = self.ax.plot([], [], 'bx')
         self.velocity = velocity
         self.x_vert = x_vert
@@ -21,6 +22,28 @@ class RoadTrackSim:
         self.time = 0
         self.gt_x = x_vert
         self.gt_y = 0
+        self.init_particles(var = 1)
+
+    def is_on_road(self, x, y):
+        if x > self.x1 and x < self.x2 and y < self.y2:
+            return True
+        if y > self.y1 and y < self.y2 and x < self.x2:
+            return True
+        return False
+
+    def init_particles(self, var):
+        def get_particles(mean, cov, num):
+            return [ tuple(x) for x in np.random.multivariate_normal(
+                mean, cov, num) ]
+        def prune_particles(particles):
+            return [ p for p in particles if self.is_on_road(*p) ]
+        particles = []
+        while len(particles) < self.num_particles:
+            particles += prune_particles(
+                get_particles([self.gt_x, self.gt_y],
+                              [[var, 0 ],[0, var]],
+                              self.num_particles))
+        self.particles = particles[0:self.num_particles]
 
     def plot_road(self):
         # road edges
@@ -73,7 +96,8 @@ road_track = RoadTrackSim(
     x_vert = 5,
     y_horiz = 10,
     road_width = 1,
-    velocity = 1)
+    velocity = 1,
+    num_particles = 500)
 # set aspect ratio to equal for correct representation
 plt.ion()
 plt.show()
