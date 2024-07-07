@@ -185,8 +185,8 @@ plt.show()
 
 delta_t = 0.1
 while True:
+    now = time.time()
     if road_track.gt_x > 0:
-        now = time.time()
         t = road_track.get_time() + delta_t
 
         # ground truth simulation
