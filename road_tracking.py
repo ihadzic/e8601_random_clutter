@@ -208,7 +208,9 @@ parser.add_argument('--npart', type=int, default=500,
 parser.add_argument('--randvel', action='store_true',
                     help='randomize vehicle true velocity')
 parser.add_argument('--noresample', action='store_true',
-                    help='turn off resampling, reducing the filter to just prediction')
+                    help='turn off resampling, reducing the filter prediction')
+parser.add_argument('--step', action='store_true',
+                    help='single-step the filter')
 args = parser.parse_args()
 
 road_track = RoadTrackSim(
@@ -226,6 +228,8 @@ road_track = RoadTrackSim(
 plt.ion()
 plt.show()
 
+if args.step:
+    print('single step mode, press ENTER to advance the simulation')
 delta_t = 0.1
 while True:
     now = time.time()
@@ -249,4 +253,7 @@ while True:
 
     # treat the eyeballs
     road_track.redraw()
-    display_sleep(now)
+    if args.step:
+        input()
+    else:
+        display_sleep(now)
