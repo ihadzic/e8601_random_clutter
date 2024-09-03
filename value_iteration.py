@@ -78,12 +78,13 @@ iteration_count=0
 values = init_values()
 print("Init")
 print(values)
+print("")
 delta = float("inf")
 while delta > epsilon:
     iteration_count+=1
     print("Iteration {}".format(iteration_count))
     new_values = iterate(values)
-    print(np.round(values, 2))
-    print("")
     delta = np.max(np.abs(new_values - values))
     values = new_values
+    print(np.round(values, 2))
+    print("")
