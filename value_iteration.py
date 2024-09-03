@@ -12,6 +12,7 @@ terminal_states = [
     { 'x': 0, 'y': 0, 'value': 50 },
     { 'x': 1, 'y': 2, 'value': -100 }
 ]
+epsilon = 0.001
 
 def terminal_state(x, y):
     for ts in terminal_states:
@@ -77,9 +78,12 @@ iteration_count=0
 values = init_values()
 print("Init")
 print(values)
-while True:
+delta = float("inf")
+while delta > epsilon:
     iteration_count+=1
     print("Iteration {}".format(iteration_count))
-    values = iterate(values)
+    new_values = iterate(values)
     print(np.round(values, 2))
     print("")
+    delta = np.max(np.abs(new_values - values))
+    values = new_values
