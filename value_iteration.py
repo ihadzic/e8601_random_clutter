@@ -15,7 +15,7 @@ parser.add_argument('--xgrid', '-x', type=int, default = 4,
                     help='grid size in x-dimension')
 parser.add_argument('--ygrid', '-y', type=int, default = 4,
                     help='grid size in y-dimension')
-parser.add_argument('--probslip' '-p', type=float, default = 0.1,
+parser.add_argument('--probslip', '-p', type=float, default = 0.1,
                     help='slip/skid probability')
 parser.add_argument('--movecost', '-m', type=float, default = 1,
                     help='cost of moving')
@@ -60,10 +60,10 @@ def get_neighbors(x, y):
     return neighbors
 
 def get_motion_distro(neighbors):
-    move_prob = 1 - (len(neighbors) - 1) * args.probslip_p
+    move_prob = 1 - (len(neighbors) - 1) * args.probslip
     distro = []
     for n in range(len(neighbors)):
-        d = [ args.probslip_p ] * len(neighbors)
+        d = [ args.probslip ] * len(neighbors)
         d[n] = move_prob
         distro.append(d)
     return distro
