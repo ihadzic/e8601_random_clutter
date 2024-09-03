@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import json
 import numpy as np
 
 parser = argparse.ArgumentParser(
@@ -20,13 +21,13 @@ parser.add_argument('--movecost', '-m', type=float, default = 1,
                     help='cost of moving')
 parser.add_argument('--epsilon', '-e', type=float, default = 1e-3,
                     help='epsilon for convergence criteria')
+parser.add_argument('--termstates', '-t', type=str,
+                    default = 'terminal_states.json',
+                    help = 'list of terminal states costs')
 args = parser.parse_args()
 
-terminal_states = [
-    { 'x': 0, 'y': 1, 'value': -100 },
-    { 'x': 0, 'y': 0, 'value': 50 },
-    { 'x': 1, 'y': 2, 'value': -100 }
-]
+with open(args.termstates) as f:
+    terminal_states = json.load(f)
 
 def terminal_state(x, y):
     for ts in terminal_states:
