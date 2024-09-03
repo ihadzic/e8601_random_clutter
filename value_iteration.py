@@ -3,11 +3,11 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser(
-    description = "Runs value-iteration algorithm on a grid of "
-    "specified size assuming the motion model that makes the robot "
-    "move in the specified direction with probability 1 - n * p "
-    "where p is the probability of skidding or slipping and moving in "
-    "one of other possible directions.")
+    description = 'Runs value-iteration algorithm on a grid of '
+    'specified size assuming the motion model that makes the robot '
+    'move in the specified direction with probability 1 - n * p '
+    'where p is the probability of skidding or slipping and moving in '
+    'one of other possible directions.')
 parser.add_argument('--gamma', '-g', type=float, default = 0.9,
                     help='discount factor gamma')
 parser.add_argument('--xgrid', '-x', type=int, default = 4,
@@ -90,15 +90,15 @@ def iterate(values):
 
 iteration_count=0
 values = init_values()
-print("Init")
+print('Init')
 print(values)
-print("")
-delta = float("inf")
+print('')
+delta = float('inf')
 while delta > args.epsilon:
     iteration_count+=1
-    print("Iteration {}".format(iteration_count))
+    print('Iteration {}'.format(iteration_count))
     new_values = iterate(values)
     delta = np.max(np.abs(new_values - values))
     values = new_values
     print(np.round(values, 2))
-    print("")
+    print('')
