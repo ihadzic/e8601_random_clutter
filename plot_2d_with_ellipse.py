@@ -1,13 +1,31 @@
 #!/usr/bin/env python
-import numpy as np
-import matplotlib.pyplot as plt
+import argparse
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Parameters for the 2D Gaussian distribution
-mean = np.array([2, 3])
-sigma_xx = 1
-sigma_yy = 2
-rho = 0.7
+
+parser = argparse.ArgumentParser(
+    description='Plots the uncertainty ellipse and random samples of a'
+    '2D Gaussian distribution, given the mean and covariance'
+)
+parser.add_argument('--sigmaxx', type=float, default=1.0,
+                     help='std dev along x-diimension, default=1')
+parser.add_argument('--sigmayy', type=float, default=2.0,
+                     help='std dev along y-diimension, default=2')
+parser.add_argument('--mx', type=float, default=2.0,
+                    help='mean of x component, default=2.0')
+parser.add_argument('--my', type=float, default=2.0,
+                    help='mean of y component, default=3.9')
+parser.add_argument('--rho', type=float, default=0.7,
+                    help='correlation coefficient, default=0.7')
+args = parser.parse_args()
+
+mean = np.array([args.mx, args.my])
+sigma_xx = args.sigmaxx
+sigma_yy = args.sigmayy
+rho = args.rho
 covariance = np.array([[sigma_xx ** 2, sigma_xx * sigma_yy * rho], 
                        [sigma_xx * sigma_yy * rho, sigma_yy ** 2]])
 
