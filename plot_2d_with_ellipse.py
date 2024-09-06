@@ -16,8 +16,8 @@ parser.add_argument('--sigmayy', type=float, default=2.0,
                      help='std dev along y-diimension, default=2')
 parser.add_argument('--mx', type=float, default=2.0,
                     help='mean of x component, default=2.0')
-parser.add_argument('--my', type=float, default=2.0,
-                    help='mean of y component, default=3.9')
+parser.add_argument('--my', type=float, default=3.0,
+                    help='mean of y component, default=3.0')
 parser.add_argument('--rho', type=float, default=0.7,
                     help='correlation coefficient, default=0.7')
 args = parser.parse_args()
