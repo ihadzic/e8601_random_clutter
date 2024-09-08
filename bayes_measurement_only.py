@@ -15,7 +15,7 @@ bel = np.array(
       [ 0.5 ] ]
 )
 
-measurements = [ 0, 1, 0, 0, 0, 1, 0, 0 ]
+measurements = [ 0, 0, 0, 0, 0, 1, 0, 0 ]
 
 for measurement in measurements:
     unnormalized_posterior = (
